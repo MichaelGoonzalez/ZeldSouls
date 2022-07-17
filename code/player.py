@@ -1,5 +1,6 @@
 from multiprocessing import current_process
 import pygame
+from support import import_folder
 from settings import *
 
 class Player(pygame.sprite.Sprite):
@@ -9,7 +10,11 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft = pos)
         self.hitbox = self.rect.inflate(0,-26)
         
-        #movement
+        # graphics setup
+        self.import_player_assets()
+        self.status = 'down'
+        
+        # movement
         self.direction = pygame.math.Vector2()
         self.speed = 5
         self.attacking = False
@@ -23,6 +28,11 @@ class Player(pygame.sprite.Sprite):
         self.animations = {'up':[],'down': [],'left':[],'right': [],
                             'right_idle':[],'left_idle':[],'up_idle':[],'down_idle':[],
                             'right_attack':[],'left_attack':[],'up_attack':[],'down_attack':[]}
+        
+        for animation in self.animations.keys():
+            full_path = character_path + animation
+            self.animations[animation] = import_folder(full_path)
+        print(self.animations)
         
     def input(self):
         keys = pygame.key.get_pressed()
@@ -64,6 +74,12 @@ class Player(pygame.sprite.Sprite):
         self.collision('vertical')
         #self.rect.center += self.direction * speed
         self.rect.center = self.hitbox.center
+        
+    def get_status(self):
+        
+        #idle status
+        if self.direction.x == 0 and self.direction.y == 0:
+            self.status
         
     def  collision(self,direction):
         if direction == 'horizontal':
